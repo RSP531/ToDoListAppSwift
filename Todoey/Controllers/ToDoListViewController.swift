@@ -33,6 +33,8 @@ class ToDoListViewController: UITableViewController {
         let newItem3 = Item()
         newItem3.title = "start the hike"
         itemArray.append(newItem3)
+        
+        loadItems()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -78,14 +80,7 @@ class ToDoListViewController: UITableViewController {
 
             self.itemArray.append(newItem)
 
-            let encoder = PropertyListEncoder()
-
-            do {
-                let data = try encoder.encode(self.itemArray)
-                try data.write(to: self.dataFilePath!)
-            } catch {
-                print("Error encoding item array, \(error)")
-            }
+            self.saveItems()
             
             self.tableView.reloadData()
         }
@@ -100,5 +95,26 @@ class ToDoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
 
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+        }
+    }
+    
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding item array, \(error)")
+
+            }
+        }
+    }
 }
 
